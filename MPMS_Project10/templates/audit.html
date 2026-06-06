@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Audit Log{% endblock %}
+{% block page_title %}Audit Log{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header"><h3>System Audit Trail</h3><span class="card-tag">Last 100 actions</span></div>
+  <div class="table-wrap">
+    <table class="cases-table">
+      <thead><tr><th>#</th><th>User</th><th>Action</th><th>Details</th><th>IP Address</th><th>Timestamp</th></tr></thead>
+      <tbody id="audit-tbody"><tr><td colspan="6" class="loading-cell">Loading…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+<script>
+fetch('/api/audit-logs').then(r=>r.json()).then(logs=>{
+  const tbody=document.getElementById('audit-tbody');
+  if(!logs.length){tbody.innerHTML='<tr><td colspan="6" class="loading-cell">No audit records</td></tr>';return;}
+  tbody.innerHTML=logs.map((l,i)=>`<tr>
+    <td style="color:var(--text-dim);font-size:12px">${i+1}</td>
+    <td><code style="font-size:12px;color:var(--blue-light)">${l.user}</code></td>
+    <td><span style="font-size:11px;background:var(--bg3);padding:2px 8px;border-radius:8px;color:var(--orange)">${l.action}</span></td>
+    <td style="font-size:12px;color:var(--text-muted);max-width:300px">${l.details}</td>
+    <td style="font-size:12px;color:var(--text-dim)">${l.ip}</td>
+    <td style="font-size:12px;color:var(--text-muted)">${l.time}</td>
+  </tr>`).join('');
+});
+</script>
+{% endblock %}

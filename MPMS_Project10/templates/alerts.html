@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Alerts{% endblock %}
+{% block page_title %}Alert Management{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <div class="toolbar-left"><h2 class="section-title">Active Emergency Alerts</h2></div>
+  {% if session.role in ['POLICE','ADMIN','LAW_ENFORCEMENT'] %}
+  <div class="toolbar-right"><button class="btn-primary" id="create-alert-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Issue Alert</button></div>
+  {% endif %}
+</div>
+<div id="alerts-container"><div class="loading-state">Loading alerts…</div></div>
+
+<div id="alert-form-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header"><h3>Issue Emergency Alert</h3><button class="modal-close" id="close-alert-form">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Select Case</label><select id="alert-case-id" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none"></select></div>
+      <div class="form-group"><label>Alert Type</label>
+        <div class="alert-type-grid">
+          <button class="alert-type-btn active" data-type="AMBER">🟡 AMBER</button>
+          <button class="alert-type-btn" data-type="SILVER">⚪ SILVER</button>
+          <button class="alert-type-btn" data-type="CRITICAL">🔴 CRITICAL</button>
+        </div>
+      </div>
+      <div class="form-group"><label>Alert Message</label><textarea id="alert-message" rows="4" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none;resize:vertical" placeholder="Describe the alert — person details, location, what to look for…"></textarea></div>
+      <div class="form-actions"><button class="btn-secondary" id="cancel-alert">Cancel</button><button class="btn-danger" id="submit-alert">🚨 Issue Alert</button></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script>const USER_ROLE="{{session.role}}";</script><script src="/static/js/alerts.js"></script>{% endblock %}

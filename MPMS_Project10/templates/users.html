@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block page_title %}User Management{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <div class="toolbar-left">
+    <div class="search-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="user-search" placeholder="Search users…"/></div>
+    <select id="role-filter" class="filter-select"><option value="">All Roles</option><option value="ADMIN">Admin</option><option value="POLICE">Police</option><option value="LAW_ENFORCEMENT">Law Enforcement</option><option value="PUBLIC">Public</option></select>
+  </div>
+  <div class="toolbar-right"><button class="btn-primary" id="add-user-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add User</button></div>
+</div>
+<div class="card"><div class="table-wrap"><table class="cases-table"><thead><tr><th>User</th><th>Username</th><th>Role</th><th>Badge</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead><tbody id="users-tbody"><tr><td colspan="7" class="loading-cell">Loading…</td></tr></tbody></table></div></div>
+
+<div id="user-form-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="user-form-title">Add New User</h3><button class="modal-close" id="close-user-form">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-user-id"/>
+      <div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="u-fullname" placeholder="Full name"/></div><div class="form-group"><label>Username *</label><input type="text" id="u-username" placeholder="Login username"/></div></div>
+      <div class="form-row"><div class="form-group"><label>Role *</label><select id="u-role"><option value="PUBLIC">Public</option><option value="POLICE">Police</option><option value="LAW_ENFORCEMENT">Law Enforcement</option><option value="ADMIN">Admin</option></select></div><div class="form-group"><label>Badge #</label><input type="text" id="u-badge" placeholder="P-001"/></div></div>
+      <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="u-email" placeholder="user@mpms.gov.pk"/></div><div class="form-group"><label>Phone</label><input type="tel" id="u-phone" placeholder="0300-XXXXXXX"/></div></div>
+      <div class="form-group"><label id="pw-label">Password *</label><input type="password" id="u-password" placeholder="Min 8 chars, uppercase, number"/></div>
+      <div class="form-group" id="active-field"><label class="checkbox-label"><input type="checkbox" id="u-active" checked/><span>Account Active</span></label></div>
+      <div class="form-group" id="unlock-field" style="display:none"><label class="checkbox-label"><input type="checkbox" id="u-unlock"/><span>Unlock Account (clear lockout)</span></label></div>
+      <div class="form-actions"><button type="button" class="btn-secondary" id="cancel-user-form">Cancel</button><button type="button" class="btn-primary" id="submit-user-btn">Add User</button></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/users.js"></script>{% endblock %}

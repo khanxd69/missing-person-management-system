@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block content %}
+<div style="max-width:800px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card">
+      <div class="card-header"><h3>Account Info</h3></div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:white;flex-shrink:0">{{ user.full_name[0]|upper }}</div>
+        <div>
+          <div style="font-size:18px;font-weight:700;font-family:var(--font-heading)">{{ user.full_name or user.username }}</div>
+          <div class="role-badge role-{{ user.role|lower }}" style="margin-top:4px">{{ user.role.replace('_',' ') }}</div>
+        </div>
+      </div>
+      <div class="detail-row"><span class="detail-label">Username</span><span class="detail-value">{{ user.username }}</span></div>
+      <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">{{ user.email or '—' }}</span></div>
+      <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value">{{ user.phone or '—' }}</span></div>
+      {% if user.badge_number %}<div class="detail-row"><span class="detail-label">Badge #</span><span class="detail-value">{{ user.badge_number }}</span></div>{% endif %}
+      <div class="detail-row"><span class="detail-label">Last Login</span><span class="detail-value">{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'N/A' }}</span></div>
+      <div class="detail-row"><span class="detail-label">Member Since</span><span class="detail-value">{{ user.created_at.strftime('%Y-%m-%d') }}</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>🔒 Change Password</h3></div>
+      <div id="pw-alert" class="alert hidden"></div>
+      <div class="form-group"><label>Current Password</label><input type="password" id="current-pw" class="full-input" placeholder="Your current password"/></div>
+      <div class="form-group"><label>New Password</label><input type="password" id="new-pw" class="full-input" placeholder="Min 8 chars, uppercase, number"/></div>
+      <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirm-pw" class="full-input" placeholder="Repeat new password"/></div>
+      <div style="height:4px;background:var(--bg4);border-radius:4px;margin-bottom:12px"><div id="pw-strength" style="height:100%;border-radius:4px;width:0;transition:all 0.3s"></div></div>
+      <button class="btn-primary" id="change-pw-btn" style="width:100%">Update Password</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <div class="card-header"><h3>Recent Activity</h3></div>
+    <div class="table-wrap">
+      <table class="cases-table">
+        <thead><tr><th>Action</th><th>Details</th><th>IP</th><th>Time</th></tr></thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td><code style="font-size:11px;color:var(--blue-light)">{{ log.action }}</code></td>
+            <td style="font-size:12px;color:var(--text-muted)">{{ log.details }}</td>
+            <td style="font-size:12px;color:var(--text-dim)">{{ log.ip_address }}</td>
+            <td style="font-size:12px;color:var(--text-muted)">{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="loading-cell">No activity yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<style>.full-input{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none}.full-input:focus{border-color:var(--red)}</style>
+<script>
+document.getElementById('new-pw').addEventListener('input',function(){
+  const s=[0,0,0,0];
+  if(this.value.length>=8)s[0]=1;
+  if(/[A-Z]/.test(this.value))s[1]=1;
+  if(/[a-z]/.test(this.value))s[2]=1;
+  if(/\d/.test(this.value))s[3]=1;
+  const score=s.reduce((a,b)=>a+b,0);
+  const colors=['','#e63946','#f4a261','#ffd60a','#2a9d8f'];
+  const bar=document.getElementById('pw-strength');
+  bar.style.width=(score*25)+'%';
+  bar.style.background=colors[score]||'transparent';
+});
+document.getElementById('change-pw-btn').addEventListener('click',async()=>{
+  const body={current_password:document.getElementById('current-pw').value,new_password:document.getElementById('new-pw').value,confirm_password:document.getElementById('confirm-pw').value};
+  const res=await fetch('/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await res.json();
+  const box=document.getElementById('pw-alert');
+  if(d.success){box.textContent='✅ Password changed successfully!';box.className='alert';box.style.background='rgba(42,157,143,0.12)';box.style.color='#52b788';box.style.border='1px solid rgba(42,157,143,0.3)';document.getElementById('current-pw').value='';document.getElementById('new-pw').value='';document.getElementById('confirm-pw').value='';}
+  else{box.textContent=d.message;box.className='alert error';}
+});
+</script>
+{% endblock %}
